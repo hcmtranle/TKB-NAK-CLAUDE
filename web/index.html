@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thời Khóa Biểu – TH Nguyễn An Khương 2026-2027</title>
+<style>
+/* ═══════════════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue-dark:   #1F4E79;
+  --blue-mid:    #2E75B6;
+  --blue-light:  #BDD7EE;
+  --blue-pale:   #EBF4FC;
+  --orange:      #FF7043;
+  --gray-100:    #F8F9FA;
+  --gray-200:    #E9ECEF;
+  --gray-400:    #ADB5BD;
+  --gray-600:    #6C757D;
+  --text:        #212529;
+  --radius:      8px;
+  --shadow:      0 2px 12px rgba(0,0,0,.10);
+  --header-h:    70px;
+}
+
+body {
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  font-size: 13px;
+  background: var(--gray-100);
+  color: var(--text);
+}
+
+/* ═══════════════════════════════════════════════════════
+   HEADER
+═══════════════════════════════════════════════════════ */
+header {
+  background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+  color: #fff;
+  padding: 0 20px;
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 3px 12px rgba(0,0,0,.25);
+  position: sticky; top: 0; z-index: 100;
+}
+.header-left h1 { font-size: 16px; font-weight: 700; letter-spacing: .5px; }
+.header-left p  { font-size: 11px; opacity: .8; margin-top: 2px; }
+.last-updated   { font-size: 11px; opacity: .7; }
+
+/* ═══════════════════════════════════════════════════════
+   TABS
+═══════════════════════════════════════════════════════ */
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: #fff;
+  padding: 8px 20px 0;
+  border-bottom: 2px solid var(--blue-light);
+  position: sticky;
+  top: var(--header-h);
+  z-index: 90;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+.tab-btn {
+  padding: 8px 20px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-600);
+  border-bottom: 3px solid transparent;
+  transition: all .2s;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.tab-btn:hover   { color: var(--blue-mid); background: var(--blue-pale); }
+.tab-btn.active  {
+  color: var(--blue-dark);
+  border-bottom-color: var(--orange);
+  background: var(--blue-pale);
+}
+
+/* ═══════════════════════════════════════════════════════
+   CONTROLS
+═══════════════════════════════════════════════════════ */
+.controls {
+  background: #fff;
+  padding: 12px 20px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--gray-200);
+}
+.controls label { font-weight: 600; color: var(--blue-dark); white-space: nowrap; }
+.controls select, .controls input {
+  padding: 6px 12px;
+  border: 1.5px solid var(--blue-light);
+  border-radius: 6px;
+  font-size: 13px;
+  background: #fff;
+  color: var(--text);
+  outline: none;
+  min-width: 180px;
+}
+.controls select:focus, .controls input:focus {
+  border-color: var(--blue-mid);
+  box-shadow: 0 0 0 3px rgba(46,117,182,.12);
+}
+.search-box { flex: 1; min-width: 200px; max-width: 320px; }
+
+/* ═══════════════════════════════════════════════════════
+   MAIN
+═══════════════════════════════════════════════════════ */
+main { padding: 20px; }
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* ═══════════════════════════════════════════════════════
+   CARD TIÊU ĐỀ
+═══════════════════════════════════════════════════════ */
+.card-title {
+  background: var(--blue-dark);
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: var(--radius) var(--radius) 0 0;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .3px;
+}
+.card-title span { opacity: .8; font-weight: 400; font-size: 12px; margin-left: 8px; }
+
+/* ═══════════════════════════════════════════════════════
+   BẢNG THỜI KHÓA BIỂU
+═══════════════════════════════════════════════════════ */
+.schedule-wrap {
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.schedule-table th, .schedule-table td {
+  border: 1px solid #dde3ea;
+  text-align: center;
+  vertical-align: middle;
+  padding: 5px 4px;
+  min-width: 80px;
+}
+/* Header ngày */
+.schedule-table th.day-col {
+  background: var(--blue-mid);
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 8px;
+}
+/* Header tiết */
+.schedule-table th.slot-col {
+  background: var(--blue-dark);
+  color: #fff;
+  font-size: 11px;
+  width: 90px;
+  min-width: 90px;
+}
+/* Cột thời gian */
+.schedule-table td.time-col {
+  background: #f0f4f8;
+  color: var(--gray-600);
+  font-size: 10px;
+  white-space: nowrap;
+  width: 82px;
+}
+/* Dòng nghỉ */
+.schedule-table tr.break-row td {
+  background: var(--gray-200);
+  color: var(--gray-400);
+  font-size: 10px;
+  font-style: italic;
+  padding: 3px;
+}
+/* Ô môn học */
+.subj-cell {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 3px;
+  border-radius: 4px;
+  line-height: 1.3;
+  cursor: default;
+  transition: transform .15s, box-shadow .15s;
+}
+.subj-cell:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0,0,0,.18);
+  z-index: 2;
+  position: relative;
+}
+.subj-cell .gv-name {
+  display: block;
+  font-size: 9px;
+  font-weight: 400;
+  opacity: .75;
+  margin-top: 1px;
+}
+.empty-cell { color: var(--gray-400); font-size: 11px; }
+
+/* ═══════════════════════════════════════════════════════
+   GRID THEO KHỐI
+═══════════════════════════════════════════════════════ */
+.grade-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.class-mini-card {
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform .2s, box-shadow .2s;
+  border: 2px solid transparent;
+}
+.class-mini-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,.15);
+  border-color: var(--blue-mid);
+}
+.mini-card-header {
+  background: var(--blue-mid);
+  color: #fff;
+  padding: 8px 14px;
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.mini-card-header .cn { font-size: 10px; font-weight: 400; opacity: .85; }
+.mini-schedule {
+  padding: 8px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+}
+.mini-day-label {
+  text-align: center;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--blue-dark);
+  padding: 2px;
+}
+.mini-cell {
+  height: 20px;
+  border-radius: 3px;
+  font-size: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: #333;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════
+   GV - CHẾ ĐỘ XEM GIÁO VIÊN
+═══════════════════════════════════════════════════════ */
+.teacher-card {
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.teacher-card-header {
+  background: var(--blue-dark);
+  color: #fff;
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.teacher-card-header h3 { font-size: 14px; }
+.teacher-card-header .role {
+  font-size: 10px; opacity: .8;
+  background: rgba(255,255,255,.15);
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+.teacher-week {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1px;
+  background: var(--gray-200);
+  padding: 1px;
+}
+.teacher-day {
+  background: #fff;
+  padding: 6px;
+  min-height: 60px;
+}
+.teacher-day-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--blue-mid);
+  text-align: center;
+  margin-bottom: 4px;
+  padding-bottom: 3px;
+  border-bottom: 1px solid var(--gray-200);
+}
+.teacher-period {
+  border-radius: 4px;
+  padding: 3px 5px;
+  margin-bottom: 2px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.teacher-period .tp-slot { opacity: .7; font-weight: 400; font-size: 9px; }
+.teacher-period .tp-class { font-size: 9px; }
+
+/* ═══════════════════════════════════════════════════════
+   LEGEND
+═══════════════════════════════════════════════════════ */
+.legend {
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px 18px;
+  margin-bottom: 20px;
+}
+.legend h4 {
+  font-size: 12px;
+  color: var(--blue-dark);
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+.legend-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+.legend-group { min-width: 180px; }
+.legend-group-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gray-600);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+.legend-swatch {
+  width: 20px; height: 14px;
+  border-radius: 3px;
+  border: 1px solid rgba(0,0,0,.1);
+  flex-shrink: 0;
+}
+.legend-item span { font-size: 11px; }
+
+/* ═══════════════════════════════════════════════════════
+   LOADING / EMPTY
+═══════════════════════════════════════════════════════ */
+.loading {
+  text-align: center;
+  padding: 60px;
+  color: var(--gray-600);
+}
+.loading .spinner {
+  width: 40px; height: 40px;
+  border: 4px solid var(--blue-light);
+  border-top-color: var(--blue-mid);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+  margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty-state {
+  text-align: center;
+  padding: 60px;
+  color: var(--gray-400);
+  font-size: 14px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  header { flex-direction: column; height: auto; padding: 10px; gap: 6px; }
+  :root { --header-h: 90px; }
+  .grade-grid { grid-template-columns: 1fr; }
+  .schedule-table th, .schedule-table td { padding: 3px 2px; min-width: 60px; }
+  .subj-cell { font-size: 9px; }
+  main { padding: 10px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════ HEADER ══════════ -->
+<header>
+  <div class="header-left">
+    <h1>⏱ THỜI KHÓA BIỂU – TH NGUYỄN AN KHƯƠNG</h1>
+    <p id="authority-text">UỶ BAN NHÂN DÂN PHƯỜNG ĐÔNG HƯNG THUẬN &nbsp;|&nbsp; Năm học 2026-2027</p>
+  </div>
+  <div class="last-updated" id="last-updated-label">Đang tải...</div>
+</header>
+
+<!-- ══════════ TABS ══════════ -->
+<nav class="tabs">
+  <button class="tab-btn active" onclick="switchTab('by-class')">📚 Theo Lớp</button>
+  <button class="tab-btn"        onclick="switchTab('by-teacher')">👩‍🏫 Theo Giáo Viên</button>
+  <button class="tab-btn"        onclick="switchTab('by-grade')">🏫 Theo Khối</button>
+</nav>
+
+<!-- ══════════ PANEL: THEO LỚP ══════════ -->
+<div id="panel-by-class" class="panel active">
+  <div class="controls">
+    <label>Chọn lớp:</label>
+    <select id="class-select" onchange="renderClassView()">
+      <option value="">-- Chọn lớp --</option>
+    </select>
+  </div>
+  <main id="class-main">
+    <div class="empty-state">Vui lòng chọn lớp để xem thời khóa biểu</div>
+  </main>
+</div>
+
+<!-- ══════════ PANEL: THEO GV ══════════ -->
+<div id="panel-by-teacher" class="panel">
+  <div class="controls">
+    <label>Tìm giáo viên:</label>
+    <input type="text" class="search-box" id="teacher-search"
+           placeholder="Nhập tên giáo viên..." oninput="filterTeachers()">
+    <label>Lọc vai trò:</label>
+    <select id="role-filter" onchange="filterTeachers()">
+      <option value="">Tất cả</option>
+      <option value="GVCN">GVCN</option>
+      <option value="Bộ môn">GV Bộ môn</option>
+      <option value="Trung tâm">GV Trung tâm</option>
+    </select>
+  </div>
+  <main id="teacher-main">
+    <div class="loading"><div class="spinner"></div>Đang tải...</div>
+  </main>
+</div>
+
+<!-- ══════════ PANEL: THEO KHỐI ══════════ -->
+<div id="panel-by-grade" class="panel">
+  <div class="controls">
+    <label>Chọn khối:</label>
+    <select id="grade-select" onchange="renderGradeView()">
+      <option value="">-- Chọn khối --</option>
+      <option value="1">Khối 1</option>
+      <option value="2">Khối 2</option>
+      <option value="3">Khối 3</option>
+      <option value="4">Khối 4</option>
+      <option value="5">Khối 5</option>
+    </select>
+  </div>
+  <main id="grade-main">
+    <div class="empty-state">Vui lòng chọn khối để xem tổng quan</div>
+  </main>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════
+const DATA_URL = "data/web_data.json";  // Thay bằng URL raw Github khi deploy
+
+let DATA = null;
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+async function init() {
+  try {
+    const res = await fetch(DATA_URL + "?t=" + Date.now());
+    DATA = await res.json();
+    onDataLoaded();
+  } catch(e) {
+    document.getElementById("last-updated-label").textContent = "⚠ Không tải được dữ liệu";
+    console.error(e);
+  }
+}
+
+function onDataLoaded() {
+  const meta = DATA.meta;
+
+  // Cập nhật header
+  document.getElementById("last-updated-label").textContent =
+    meta.last_updated ? `Cập nhật: ${meta.last_updated}` : "Dữ liệu đã tải";
+
+  // Điền dropdown lớp
+  const sel = document.getElementById("class-select");
+  Object.keys(DATA.by_class).sort().forEach(cls => {
+    const opt = document.createElement("option");
+    opt.value = cls;
+    opt.textContent = `Lớp ${cls}`;
+    sel.appendChild(opt);
+  });
+
+  // Render GV mặc định
+  renderAllTeachers();
+}
+
+// ═══════════════════════════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════════════════════════
+function switchTab(tab) {
+  document.querySelectorAll(".tab-btn").forEach((b, i) => {
+    const tabs = ["by-class","by-teacher","by-grade"];
+    b.classList.toggle("active", tabs[i] === tab);
+  });
+  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+  document.getElementById(`panel-${tab}`).classList.add("active");
+}
+
+// ═══════════════════════════════════════════════════════
+// THEO LỚP
+// ═══════════════════════════════════════════════════════
+const SLOT_ORDER = [1,2,"break_am",3,4,"lunch",5,6,"break_pm",7,8];
+const DAYS = [2,3,4,5,6];
+const DAY_NAMES = {2:"Thứ Hai",3:"Thứ Ba",4:"Thứ Tư",5:"Thứ Năm",6:"Thứ Sáu"};
+const DAY_SHORT = {2:"HAI",3:"BA",4:"TƯ",5:"NĂM",6:"SÁU"};
+
+function renderClassView() {
+  const cls = document.getElementById("class-select").value;
+  const main = document.getElementById("class-main");
+  if (!cls || !DATA) {
+    main.innerHTML = '<div class="empty-state">Vui lòng chọn lớp</div>';
+    return;
+  }
+
+  const clsData = DATA.by_class[cls];
+  if (!clsData) return;
+
+  const grade = clsData.grade;
+  const cn = clsData.homeroom_short;
+
+  let html = `
+    <div class="schedule-wrap">
+      <div class="card-title">
+        Lớp ${cls} <span>– GVCN: ${cn}</span>
+      </div>
+      <div style="overflow-x:auto">
+      <table class="schedule-table">
+        <thead>
+          <tr>
+            <th class="slot-col">Tiết</th>
+            <th class="slot-col">Giờ</th>
+            ${DAYS.map(d => `<th class="day-col">${DAY_NAMES[d]}</th>`).join("")}
+          </tr>
+        </thead>
+        <tbody>`;
+
+  SLOT_ORDER.forEach(sid => {
+    const slotMeta = DATA.meta.time_slots.find(s => s.id == sid);
+    if (!slotMeta) return;
+    if (sid === 8 && grade <= 2) return; // Khối 1,2 không có Tiết 8
+
+    if (slotMeta.is_break) {
+      html += `<tr class="break-row">
+        <td colspan="${2 + DAYS.length}">${slotMeta.label} &nbsp;(${slotMeta.time})</td>
+      </tr>`;
+      return;
+    }
+
+    html += `<tr>
+      <td style="background:#1F4E79;color:#fff;font-weight:700;font-size:11px">${slotMeta.label}</td>
+      <td class="time-col">${slotMeta.time}</td>`;
+
+    DAYS.forEach(day => {
+      const dayStr = String(day);
+      const dayData = clsData.schedule[dayStr];
+      if (!dayData) { html += "<td></td>"; return; }
+
+      const period = (dayData.periods || []).find(p => p.slot_id == sid);
+      if (!period || !period.subject) {
+        html += `<td><span class="empty-cell">—</span></td>`;
+        return;
+      }
+
+      const color = period.subject_color || "#FFFFFF";
+      const textColor = isFixed(period.subject) ? "#FFFFFF" : "#222";
+      const gvName = period.teacher_name ? `<span class="gv-name">${period.teacher_name}</span>` : "";
+
+      html += `<td>
+        <div class="subj-cell"
+             style="background:${color};color:${textColor}"
+             title="${period.subject}&#10;${period.teacher_name}">
+          ${period.subject}${gvName}
+        </div>
+      </td>`;
+    });
+
+    html += "</tr>";
+  });
+
+  html += `</tbody></table></div></div>`;
+
+  // Legend
+  html += buildLegend();
+  main.innerHTML = html;
+}
+
+function isFixed(subj) {
+  return subj === "HĐTN(CC)" || subj === "HĐTN(SHL)";
+}
+
+// ═══════════════════════════════════════════════════════
+// THEO GIÁO VIÊN
+// ═══════════════════════════════════════════════════════
+function renderAllTeachers() {
+  if (!DATA) return;
+  const main = document.getElementById("teacher-main");
+  const search = (document.getElementById("teacher-search")?.value || "").toLowerCase();
+  const roleFilter = document.getElementById("role-filter")?.value || "";
+
+  const teachers = Object.entries(DATA.by_teacher).filter(([id, t]) => {
+    const matchName = t.name.toLowerCase().includes(search) ||
+                      t.short.toLowerCase().includes(search);
+    const matchRole = !roleFilter || t.role.includes(roleFilter);
+    // Chỉ hiện GV có lịch dạy
+    const hasPeriods = Object.values(t.schedule).some(d => d.periods.length > 0);
+    return matchName && matchRole && hasPeriods;
+  });
+
+  if (!teachers.length) {
+    main.innerHTML = '<div class="empty-state">Không tìm thấy giáo viên phù hợp</div>';
+    return;
+  }
+
+  let html = "";
+  teachers.sort((a, b) => a[1].name.localeCompare(b[1].name, "vi")).forEach(([id, t]) => {
+    html += `
+    <div class="teacher-card">
+      <div class="teacher-card-header">
+        <h3>${t.name} <small style="font-weight:400;opacity:.8">(${t.short})</small></h3>
+        <span class="role">${t.role}</span>
+      </div>
+      <div class="teacher-week">`;
+
+    DAYS.forEach(day => {
+      const dayStr = String(day);
+      const dayData = t.schedule[dayStr] || {};
+      const periods = (dayData.periods || []).slice().sort((a,b) => a.slot_id - b.slot_id);
+
+      html += `<div class="teacher-day">
+        <div class="teacher-day-label">${DAY_SHORT[day]}</div>`;
+
+      if (!periods.length) {
+        html += `<div style="text-align:center;color:#bbb;font-size:10px;padding:8px">—</div>`;
+      } else {
+        periods.forEach(p => {
+          const color = p.subject_color || "#E0E0E0";
+          html += `<div class="teacher-period" style="background:${color}">
+            <span class="tp-slot">T${p.slot_id}</span>
+            ${p.subject}
+            <span class="tp-class">${p.class}</span>
+          </div>`;
+        });
+      }
+      html += `</div>`;
+    });
+
+    html += `</div></div>`;
+  });
+
+  main.innerHTML = html;
+}
+
+function filterTeachers() { renderAllTeachers(); }
+
+// ═══════════════════════════════════════════════════════
+// THEO KHỐI
+// ═══════════════════════════════════════════════════════
+function renderGradeView() {
+  const grade = document.getElementById("grade-select").value;
+  const main  = document.getElementById("grade-main");
+
+  if (!grade || !DATA) {
+    main.innerHTML = '<div class="empty-state">Vui lòng chọn khối</div>';
+    return;
+  }
+
+  const gradeData = DATA.by_grade[grade];
+  if (!gradeData) return;
+
+  let html = `
+    <div class="schedule-wrap" style="margin-bottom:16px">
+      <div class="card-title">Khối ${grade} – Tổng quan nhanh</div>
+    </div>
+    <div class="grade-grid">`;
+
+  gradeData.classes.forEach(cls => {
+    const clsData = DATA.by_class[cls];
+    if (!clsData) return;
+
+    // Mini schedule: chỉ hiện tiết 1-7, bỏ break
+    const MINI_SLOTS = [1,2,3,4,5,6,7];
+    if (Number(grade) >= 3) MINI_SLOTS.push(8);
+
+    html += `<div class="class-mini-card" onclick="goToClass('${cls}')">
+      <div class="mini-card-header">
+        <span>Lớp ${cls}</span>
+        <span class="cn">${clsData.homeroom_short || ""}</span>
+      </div>
+      <div class="mini-schedule">
+        ${DAYS.map(d => `<div class="mini-day-label">${DAY_SHORT[d]}</div>`).join("")}`;
+
+    MINI_SLOTS.forEach(slot => {
+      DAYS.forEach(day => {
+        const dayData = clsData.schedule[String(day)];
+        const period = (dayData?.periods || []).find(p => p.slot_id === slot);
+        const subj  = period?.subject || "";
+        const color = period?.subject_color || "#f0f4f8";
+        html += `<div class="mini-cell"
+                      style="background:${color};color:${isFixed(subj)?'#fff':'#333'}"
+                      title="T${slot} ${DAY_SHORT[day]}: ${subj}">
+                   ${subj ? abbrev(subj) : ""}
+                 </div>`;
+      });
+    });
+
+    html += `</div></div>`;
+  });
+
+  html += `</div>`;
+  html += buildLegend();
+  main.innerHTML = html;
+}
+
+function goToClass(cls) {
+  document.getElementById("class-select").value = cls;
+  switchTab("by-class");
+  renderClassView();
+  window.scrollTo(0, 0);
+}
+
+// ═══════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════
+function abbrev(subj) {
+  // Rút gọn tên môn cho mini-cell
+  const map = {
+    "Tiếng Việt":"TV","Toán":"Toán","Đạo đức":"ĐĐ","TNXH":"TNXH",
+    "Khoa học":"KH","LSĐL":"LSĐL","Công nghệ":"CN",
+    "HĐTN(CC)":"CC","HĐTN(SHL)":"SHL","HĐTN(CĐ)":"HĐ",
+    "GDTC":"TC","NT(MT)":"MT","NT(ÂN)":"ÂN",
+    "TA":"TA","TH":"TH","IC3":"IC3","CDS":"CDS",
+    "STEM":"ST","KNS":"KNS","TA(BN)":"BN","TA(T-K)":"TK","Toán TD":"TTD",
+    "Tự học":"TH",
+  };
+  return map[subj] || subj.substring(0, 4);
+}
+
+function buildLegend() {
+  if (!DATA) return "";
+  const groups = [
+    { title: "Cốt lõi GVCN",      items: ["TV","Toán","ĐĐ","TNXH","KH","LSĐL","CN","NT(MT)"] },
+    { title: "Chuyên biệt trường", items: ["GDTC","NT(ÂN)","TA","TH"] },
+    { title: "TA Tăng cường",      items: ["TA(BN)","TA(T-K)"] },
+    { title: "Liên kết chiều",     items: ["IC3","CDS","STEM","KNS","Toán TD"] },
+    { title: "Cố định",            items: ["HĐTN(CC)","HĐTN(SHL)","HĐTN(CĐ)"] },
+    { title: "Tự học / CLB",       items: ["Tự học"] },
+  ];
+  const colorMap = DATA.meta.color_map || {};
+
+  let html = `<div class="legend">
+    <h4>Chú giải màu môn học</h4>
+    <div class="legend-groups">`;
+
+  groups.forEach(g => {
+    html += `<div class="legend-group">
+      <div class="legend-group-title">${g.title}</div>`;
+    g.items.forEach(item => {
+      const color = colorMap[item] || "#FFFFFF";
+      html += `<div class="legend-item">
+        <div class="legend-swatch" style="background:${color}"></div>
+        <span>${item}</span>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+
+  html += `</div></div>`;
+  return html;
+}
+
+// ═══════════════════════════════════════════════════════
+// KHỞI ĐỘNG
+// ═══════════════════════════════════════════════════════
+window.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
